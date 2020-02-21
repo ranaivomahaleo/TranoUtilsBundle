@@ -3,6 +3,7 @@
     "description": "Trano Utils Bundle",
     "type": "symfony-bundle",
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Ranaivo Razakanirina",
@@ -15,6 +16,7 @@
         }
     },
     "require": {
+        "php": "^7.1",
         "symfony/orm-pack": "^1.0.8"
     }
 }
