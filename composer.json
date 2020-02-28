@@ -17,6 +17,7 @@
     },
     "require": {
         "php": "^7.1",
-        "symfony/orm-pack": "^1.0"
+        "symfony/orm-pack": "^1.0",
+        "symfony/http-client": "^4.3|^5.0"
     }
 }
