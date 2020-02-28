@@ -80,7 +80,7 @@ class HttpRequest
             return $this;
         } // if
 
-        $this->headers['auth'] = [$username, $password];
+        $this->headers['auth_basic'] = [$username, $password];
         return $this;
     } // setBasicAuth
 
@@ -89,7 +89,7 @@ class HttpRequest
     {
         try {
             $httpClient = HttpClient::create();
-            $response = $httpClient->request('GET', $url);
+            $response = $httpClient->request('GET', $url, $this->headers);
             // do this instead
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
