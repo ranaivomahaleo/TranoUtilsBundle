@@ -101,6 +101,28 @@ class HttpRequest
         } catch (TransportExceptionInterface $transportException) {
             return null;
         } // try
-    }
+    } // get
+
+
+
+    public function post($url)
+    {
+        try {
+            $httpClient = HttpClient::create();
+            $response = $httpClient->request('POST', $url, $this->headers);
+            // do this instead
+            if (200 !== $response->getStatusCode()) {
+                // handle the HTTP request error (e.g. retry the request)
+                throw new TransportException();
+            } else {
+                $responseBody = $response->toArray();
+                return $responseBody;
+            } // if
+        } catch (TransportExceptionInterface $transportException) {
+            return null;
+        } // try
+    } // post
+
+
 
 }
