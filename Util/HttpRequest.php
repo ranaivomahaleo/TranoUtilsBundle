@@ -85,6 +85,19 @@ class HttpRequest
     } // setBasicAuth
 
 
+    public function setBodyRawString($raw = '')
+    {
+        $this->headers['body'] = $raw;
+        return $this;
+    } // setBodyRawString
+
+    public function setBodyArray($bodyAssocArray = [])
+    {
+        $this->headers['body'] = $bodyAssocArray;
+        return $this;
+    } // setBodyArray
+
+
     public function get($url)
     {
         try {
