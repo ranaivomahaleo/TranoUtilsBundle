@@ -1,14 +1,23 @@
 # TranoUtilsBundle  
   
-The TranoUtilsBundle contains utilities to simplify 
-the construction of json responses for REST API (CORS constraints)
-by setting Http Status code and Access-Control-Allow-* headers from .env file.
-This bundle sets the following json response data:
-- Http Status code
-- Access-Control-Allow-* headers from .env file
-- Returned data
+The TranoUtilsBundle contains utilities for the following purposes:
+- Json responses setter for REST API with configurable CORS headers using .env file variables
+- Simple syntax http query service
+- Environment variable reader
 
-See as follows an exemple of json response for the 200 http status code:
+## Installation  
+  
+Install with composer using
+
+    composer require trano/tranoutilsbundle
+
+## Usage of Json response setter with CORS headers
+
+### Standard json response
+
+Let us consider that the GET method of our API returns the json below with ```Access-Control-Allow-Origin=*```, 
+```Access-Control-Allow-Methods=GET,POST``` and ```Access-Control-Allow-Headers=Authorization, Content-Type``` 
+and with HTTP 200.
 
     {
         "status": 200, 
@@ -16,33 +25,105 @@ See as follows an exemple of json response for the 200 http status code:
         "results": "this is an ok results"
     }
 
-The json response format is as follows:
+The php instruction to return the above json is
 
+    return $this->apijsonresponse->_200Ok('this is an ok results');
+
+```$apijsonresponse``` is a ```Trano\UtilsBundle\Util\ApiJsonResponse``` service.
+
+The necessary environment variables at .env file are
+
+```
+ALLOWED_ORIGIN="*"
+ALLOWED_METHODS="GET,POST"
+ALLOWED_HEADERS="Authorization, Content-Type"
+```
+
+### Custom json response
+
+For a custom Json, set the environment variable ```JSON_RESPONSE_TYPE``` to ```custom```
+```
+JSON_RESPONSE_TYPE=custom
+```
+Thus, the following php instruction
+
+    return $this->apijsonresponse->_200Ok(["data" => 'this is an ok custom results']);
+
+will return the custom json below
+
+```
     {
-        "status": <HTTP status code>, 
-        "message": <Message related to the json response>,
-        "results": <Data (string data or json data)>
+        "data": "this is an ok custom results"
     }
+```
 
-Installation  
-------------  
-Install with composer using
+## Usage of simple Http request
 
-    composer require trano/tranoutilsbundle
+The ```$httprequest``` service is an instance of ```Trano\UtilsBundle\Util\HttpRequest```
 
-Usage  
------
-The bundles consists of two parts:
-- Environment reader (```ABS\UtilsBundle\Util\Env```)  
-- Json response (```ABS\UtilsBundle\Util\ApiJsonResponse```)
+### GET query with basic Auth
 
-Let us consider the .env file
+To return an associative array response using GET, use the following instruction. The get instruction should be at the end.
+
+```php
+    $http_array_response = $this->httprequest
+            ->addHeader('Accept', '*/*')
+            ->addHeader('Content-Type', 'application/json')
+            ->setBasicAuth('username', 'password')
+            ->get('https://www.example.com/getservice');
+```
+
+### POST query with array data and basic Auth
+
+To return an associative array response using POST, use the instructions below.
+
+The $data variable is sent by default using ```application/x-www-form-urlencoded``` type.
+If ```https://www.example.com/postservice``` is a Symfony controller route, ```$data['data1']``` variable 
+would be get using ```$request->request->get('data1');``` instruction.
+
+The post instruction should be at the end.
+``
+```php
+    $data = [
+        'data1' => 'data1',
+        'data2' => 'data2',
+    ];
+    $http_array_response = $this->httprequest
+        ->setBasicAuth('username', 'password')
+        ->setBodyArray($data)
+        ->post('https://www.example.com/postservice');
+```
+
+Notice that due to the functionalities of the symfony http request, both GET and POST simple queries 
+are synchronous (those queries wait for the response).
+
+## Usage of Environment variable reader
+
+Let us consider that we have the following environment variable file .env
+
+```
+DATABASE_URL='mysql://aaa:bbb...'
+```
+
+To read this environment variable, use the $env service, an instance of ```Trano\UtilsBundle\Util\Env``` 
+as follows
+
+```php
+$database_url = $this->env->getEnv('DATABASE_URL');
+````
+
+## Example with a Symfony controller  
+
+Let us consider the environment variable at .env file
 
 ```
 ALLOWED_ORIGIN="*"
 ALLOWED_METHODS="GET,POST,PUT,DELETE"
 ALLOWED_HEADERS="Authorization, Content-Type"
 ```
+
+Important: If the ALLOWED_* are not set in .env file, the corresponsing 
+Access-Control-Allow-* headers will not be set.
 
 To use the environment reader (```Trano\UtilsBundle\Util\Env```) 
 and the Json response (```Trano\UtilsBundle\Util\ApiJsonResponse```) in a controller, use the following script
@@ -94,25 +175,13 @@ class HomeController extends AbstractController
     } // index
 }
 ```
-The route / above returns the following json data.
+The route / above reads DATABASE_URL variable environment and returns the following json data.
 
     {
         "status": 200, 
         "message": "",
         "results": "this is an ok results"
     }
-
-Additionally, the following headers will be set respectivelly from the values
-of ```ALLOWED_ORIGIN```, ```ALLOWED_METHODS```, ```ALLOWED_HEADERS``` from .env file
-
-```
-Access-Control-Allow-Origin="*"
-Access-Control-Allow-Headers="GET,POST,PUT,DELETE"
-Access-Control-Allow-Methods="Authorization, Content-Type"
-```
-
-Important: If the ALLOWED_* are not set in .env file, the corresponsing 
-Access-Control-Allow-* headers will not be set.
   
 License  
 -------  
@@ -120,6 +189,6 @@ This bundle is under the MIT license. See the complete license [in the bundle](L
   
 About us  
 --------  
-ABSUtilsBundle is an initiative of [atety][1].  
+TranoUtilsBundle is an initiative of [atety][1].  
   
 [1]: https://www.atety.com

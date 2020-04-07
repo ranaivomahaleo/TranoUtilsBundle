@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ApiJsonResponse
 {
+
+    private $json_response_type = 'standard';
+
     /**
      * @var Env
      */
@@ -30,7 +33,14 @@ class ApiJsonResponse
     public function __construct(Env $env)
     {
         $this->env = $env;
-    }
+
+        $this->json_response_type = $this->env->getEnv('JSON_RESPONSE_TYPE');
+        if (!$this->json_response_type) {
+            $this->json_response_type = 'standard';
+        } else {
+            $this->json_response_type = $this->env->getEnv('JSON_RESPONSE_TYPE');
+        } // if
+    } // __construct
 
     private function buildAccessControlHeaders()
     {
@@ -47,34 +57,99 @@ class ApiJsonResponse
         return $headers;
     } // buildAccessControlHeaders
 
+    /**
+     * Allowed status: standard, custom (by default, it is standard)
+     * @param $status
+     * @param $message
+     * @param $results
+     */
+    private function buildJsonResult($statuscode, $message, $results)
+    {
+        switch ($this->json_response_type) {
+            case 'custom':
+                return $results;
+                break;
+            case 'standard':
+            default:
+                return ['status' => $statuscode, 'message' => $message, 'results' => $results];
+        } // switch
 
-    public function _200Ok($results = []) {
+    } // buildJsonResult
+
+
+    /**
+     * @param array $results
+     * @return JsonResponse
+     */
+    public function _200Ok($results = [])
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 200, 'message' => '', 'results' => $results],
+            $this->buildJsonResult(200, '', $results),
             JsonResponse::HTTP_OK,
             $headers
         );
     } // _200Ok
 
-    public function _204NoContent($results = []) {
+
+    /**
+     * @param array $results
+     * @return JsonResponse
+     */
+    public function _201Created($results = [])
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 204, 'message' => 'No content returned', 'results' => $results],
+            $this->buildJsonResult(201, 'Content created', $results),
+            JsonResponse::HTTP_CREATED,
+            $headers
+        );
+    } // 201Created
+
+
+    /**
+     * @param array $results
+     * @return JsonResponse
+     */
+    public function _202Accepted($results = [])
+    {
+        $headers = $this->buildAccessControlHeaders();
+        return new JsonResponse(
+            $this->buildJsonResult(202, 'Accepted query', $results),
+            JsonResponse::HTTP_ACCEPTED,
+            $headers
+        );
+    } // _202Accepted
+
+
+    /**
+     * @param array $results
+     * @return JsonResponse
+     */
+    public function _204NoContent($results = [])
+    {
+        $headers = $this->buildAccessControlHeaders();
+        return new JsonResponse(
+            $this->buildJsonResult(204, 'No content returned', $results),
             JsonResponse::HTTP_NO_CONTENT,
             $headers
         );
-    }
+    } // _204NoContent
 
 
-    public function _400BadRequest($errorstring = '') {
+    /**
+     * @param string $errorstring
+     * @return JsonResponse
+     */
+    public function _400BadRequest($errorstring = '')
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 400, 'message' => $errorstring, 'results' => []],
+            $this->buildJsonResult(400, $errorstring, []),
             JsonResponse::HTTP_BAD_REQUEST,
             $headers
         );
-    }
+    } // _400BadRequest
 
 
     /**
@@ -82,14 +157,15 @@ class ApiJsonResponse
      * @param string $errorstring
      * @return JsonResponse
      */
-    public function _401NotAuthorized($errorstring = '') {
+    public function _401NotAuthorized($errorstring = '')
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 401, 'message' => $errorstring, 'results' => []],
+            $this->buildJsonResult(401, $errorstring, []),
             JsonResponse::HTTP_UNAUTHORIZED,
             $headers
         );
-    }
+    } // _401NotAuthorized
 
 
     /**
@@ -97,22 +173,28 @@ class ApiJsonResponse
      * @param string $errorstring
      * @return JsonResponse
      */
-    public function _403StrictNotAuthorized($errorstring = '') {
+    public function _403StrictNotAuthorized($errorstring = '')
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 403, 'message' => $errorstring, 'results' => []],
+            $this->buildJsonResult(403, $errorstring, []),
             JsonResponse::HTTP_FORBIDDEN,
             $headers
         );
-    }
+    } // _403StrictNotAuthorized
 
-    public function _404NotFound($errorstring = '') {
+    /**
+     * @param string $errorstring
+     * @return JsonResponse
+     */
+    public function _404NotFound($errorstring = '')
+    {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            ['status' => 404, 'message' => $errorstring, 'results' => []],
+            $this->buildJsonResult(403, $errorstring, []),
             JsonResponse::HTTP_NOT_FOUND,
             $headers
         );
-    }
+    } // _404NotFound
 
 }
