@@ -31,6 +31,12 @@ class HttpRequest
     ];
 
 
+    /**
+     * @var float
+     */
+    private $timeout = 0;
+
+
     public function resetHeader()
     {
         $this->headers = [
@@ -96,6 +102,12 @@ class HttpRequest
         $this->headers['body'] = $bodyAssocArray;
         return $this;
     } // setBodyArray
+
+    public function setTimeOut($timeout = 0)
+    {
+        $this->headers['timeout'] = $timeout;
+        return $this;
+    } // setTimeOut
 
 
     public function get($url)
