@@ -90,6 +90,16 @@ class HttpRequest
         return $this;
     } // setBasicAuth
 
+    public function setBearerAuth($bearerToken = '')
+    {
+        if (!$bearerToken) {
+            return $this;
+        } // if
+
+        $this->headers['auth_bearer'] = $bearerToken;
+        return $this;
+    } // setBearerAuth
+
 
     public function setBodyRawString($raw = '')
     {
