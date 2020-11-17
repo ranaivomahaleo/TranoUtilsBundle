@@ -30,6 +30,11 @@ class HttpRequest
         ]
     ];
 
+    /**
+     * @var array
+     */
+    private $options = [];
+
 
     /**
      * @var float
@@ -46,7 +51,20 @@ class HttpRequest
             ]
         ];
         return $this;
+    }
+
+    /**
+     * @param array $options
+     * @return HttpRequest
+     */
+    public function setOptions(array $options): HttpRequest
+    {
+        $this->options = $options;
+        return $this;
     } // resetHeader
+
+
+
 
 
     public function setHeader($key = '', $value = '')
@@ -123,7 +141,7 @@ class HttpRequest
     public function get($url)
     {
         try {
-            $httpClient = HttpClient::create();
+            $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('GET', $url, $this->headers);
             // do this instead
             if (200 !== $response->getStatusCode()) {
@@ -143,7 +161,7 @@ class HttpRequest
     public function post($url)
     {
         try {
-            $httpClient = HttpClient::create();
+            $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('POST', $url, $this->headers);
             // do this instead
             if (200 !== $response->getStatusCode()) {
