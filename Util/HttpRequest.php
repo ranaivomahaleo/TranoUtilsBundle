@@ -42,6 +42,36 @@ class HttpRequest
     private $timeout = 0;
 
 
+    /**
+     * @var Env
+     */
+    private $env;
+
+    /**
+     * HttpRequest constructor.
+     * @param Env $env
+     */
+    public function __construct(Env $env)
+    {
+        $this->env = $env;
+
+        // Link HTTP_SSL_VERIFY_PEER from .env variable to verify_peer.
+        // By default, verify_peer is true for security reasons.
+        switch ($this->env->getEnv('HTTP_SSL_VERIFY_PEER')) {
+
+            case 'inactive':
+                $this->options['verify_peer'] = false;
+                break;
+
+            case 'active':
+            default:
+                $this->options['verify_peer'] = true;
+                break;
+        } // switch
+
+    }
+
+
     public function resetHeader()
     {
         $this->headers = [
@@ -141,6 +171,11 @@ class HttpRequest
     public function get($url)
     {
         try {
+
+            if ($this->env->getEnv('ALLOWED_ORIGIN')) {
+                $headers['Access-Control-Allow-Origin'] = $this->env->getEnv('ALLOWED_ORIGIN');
+            } // if
+
             $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('GET', $url, $this->headers);
             // do this instead
