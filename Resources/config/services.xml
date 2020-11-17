@@ -5,7 +5,9 @@
         http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
-        <service id="Trano\UtilsBundle\Util\HttpRequest" />
+        <service id="Trano\UtilsBundle\Util\HttpRequest" >
+            <argument type="service" id="Trano\UtilsBundle\Util\Env" />
+        </service>
 
         <service id="Trano\UtilsBundle\Util\Env" />
 
