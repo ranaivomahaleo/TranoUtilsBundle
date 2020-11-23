@@ -181,7 +181,8 @@ class HttpRequest
             // do this instead
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
-                throw new TransportException();
+                // throw new TransportException();
+                return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
             } else {
                 $responseBody = $response->toArray();
                 return $responseBody;
@@ -201,7 +202,8 @@ class HttpRequest
             // do this instead
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
-                throw new TransportException();
+                // throw new TransportException();
+                return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
             } else {
                 $responseBody = $response->toArray();
                 return $responseBody;
