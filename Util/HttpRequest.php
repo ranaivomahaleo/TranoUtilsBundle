@@ -187,8 +187,9 @@ class HttpRequest
                 $responseBody = $response->toArray();
                 return $responseBody;
             } // if
-        } catch (TransportExceptionInterface $transportException) {
-            return null;
+        } catch (\Exception $e) {
+            return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            //return null;
         } // try
     } // get
 
@@ -208,8 +209,9 @@ class HttpRequest
                 $responseBody = $response->toArray();
                 return $responseBody;
             } // if
-        } catch (TransportExceptionInterface $transportException) {
-            return null;
+        } catch (\Exception $e) {
+            return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            //return null;
         } // try
     } // post
 
