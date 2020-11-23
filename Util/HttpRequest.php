@@ -37,6 +37,12 @@ class HttpRequest
 
 
     /**
+     * @var bool
+     */
+    private $verbose = false;
+
+
+    /**
      * @var float
      */
     private $timeout = 0;
@@ -54,6 +60,10 @@ class HttpRequest
     public function __construct(Env $env)
     {
         $this->env = $env;
+
+        // Default false. It returns null in case of error.
+        // When verbose is true, the query returns an array with complete info concerning all errors.
+        $this->verbose = false;
 
         // Link HTTP_SSL_VERIFY_PEER from .env variable to verify_peer.
         // By default, verify_peer is true for security reasons.
@@ -165,7 +175,19 @@ class HttpRequest
     {
         $this->headers['timeout'] = $timeout;
         return $this;
+    }
+
+    /**
+     * @param bool $verbose
+     * @return HttpRequest
+     */
+    public function setVerbose(bool $verbose): HttpRequest
+    {
+        $this->verbose = $verbose;
+        return $this;
     } // setTimeOut
+
+
 
 
     public function get($url)
@@ -182,14 +204,19 @@ class HttpRequest
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
-                return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                if ($this->verbose) {
+                    return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                } // if
+                return null;
             } else {
                 $responseBody = $response->toArray();
                 return $responseBody;
             } // if
         } catch (\Exception $e) {
-            return ['status' => $e->getCode(), 'message' => $e->getMessage()];
-            //return null;
+            if ($this->verbose) {
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            } // if
+            return null;
         } // try
     } // get
 
@@ -204,14 +231,19 @@ class HttpRequest
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
-                return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                if ($this->verbose) {
+                    return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                } // if
+                return null;
             } else {
                 $responseBody = $response->toArray();
                 return $responseBody;
             } // if
         } catch (\Exception $e) {
-            return ['status' => $e->getCode(), 'message' => $e->getMessage()];
-            //return null;
+            if ($this->verbose) {
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            } // if
+            return null;
         } // try
     } // post
 
