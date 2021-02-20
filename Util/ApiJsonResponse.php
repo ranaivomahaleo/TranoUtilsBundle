@@ -52,8 +52,9 @@ class ApiJsonResponse
             $headers['Strict-Transport-Security'] = $this->env->getEnv('HEADER_STRICT_TRANSPORT_SECURITY');
         }  // if
 
-        // Set to no-store by default to avoid storing information in the cache of the browser
-        $headers['Cache-Control'] = 'no-store';
+        // Set to no-cache, no-store, must-revalidate
+        // by default to avoid storing information in the cache of the browser
+        $headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
         if ($this->env->getEnv('HEADER_CACHE_CONTROL')) {
             $headers['Cache-Control'] = $this->env->getEnv('HEADER_CACHE_CONTROL');
         }  // if
@@ -62,12 +63,6 @@ class ApiJsonResponse
         $headers['Pragma'] = 'no-cache';
         if ($this->env->getEnv('HEADER_PRAGMA')) {
             $headers['Pragma'] = $this->env->getEnv('HEADER_PRAGMA');
-        }  // if
-
-        // Unset powered by information by default
-        $headers['X-Powered-By'] = '';
-        if ($this->env->getEnv('HEADER_X_POWERED_BY')) {
-            $headers['X-Powered-By'] = $this->env->getEnv('HEADER_X_POWERED_BY');
         }  // if
 
         // Do not include a referrer info by default to avoid tracking
