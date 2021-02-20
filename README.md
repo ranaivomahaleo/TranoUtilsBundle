@@ -13,7 +13,29 @@ Install with composer using
 
 ## Usage of Json response setter with CORS headers
 
-### Standard json response
+### Standard json response considering default security headers
+
+By default, the following secured header (https://owasp.org/) values are send back to the client:
+
+    Strict-Transport-Security: max-age=31536000M
+    Cache-Control: no-cache, no-store, must-revalidate
+    Pragma: no-cache
+    Referrer-Policy: no-referrer
+    X-Content-Type-Options: nosniff
+    Content-Security-Policy: default-src 'self'
+    X-Frame-Options: deny
+    X-XXS-Protection: 1; mode=block
+
+The above headers can be updated using the following environment variables
+
+    HEADER_STRICT_TRANSPORT_SECURITY=""
+    HEADER_CACHE_CONTROL=""
+    HEADER_PRAGMA=""
+    HEADER_REFERRER_POLICY=""
+    HEADER_X_CONTENT_TYPE_OPTIONS=""
+    HEADER_CONTENT_SECURITY_POLICY=""
+    HEADER_X_FRAME_OPTIONS=""
+    HEADER_X_XXS_PROTECTION=""
 
 Let us consider that the GET method of our API returns the json below with ```Access-Control-Allow-Origin=*```, 
 ```Access-Control-Allow-Methods=GET,POST``` and ```Access-Control-Allow-Headers=Authorization, Content-Type``` 
