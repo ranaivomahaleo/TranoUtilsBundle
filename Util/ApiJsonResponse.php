@@ -58,6 +58,18 @@ class ApiJsonResponse
             $headers['Cache-Control'] = $this->env->getEnv('HEADER_CACHE_CONTROL');
         }  // if
 
+        // Set the Pragma by default to no-cache. This is related to Cache-Control header
+        $headers['Pragma'] = 'no-cache';
+        if ($this->env->getEnv('HEADER_PRAGMA')) {
+            $headers['Pragma'] = $this->env->getEnv('HEADER_PRAGMA');
+        }  // if
+
+        // Unset powered by information by default
+        $headers['X-Powered-By'] = '';
+        if ($this->env->getEnv('HEADER_X_POWERED_BY')) {
+            $headers['X-Powered-By'] = $this->env->getEnv('HEADER_X_POWERED_BY');
+        }  // if
+
         // Do not include a referrer info by default to avoid tracking
         $headers['Referrer-Policy'] = 'no-referrer';
         if ($this->env->getEnv('HEADER_REFERRER_POLICY')) {
