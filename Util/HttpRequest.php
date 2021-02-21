@@ -200,21 +200,27 @@ class HttpRequest
 
             $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('GET', $url, $this->headers);
+
             // do this instead
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                    return ['status' => $response->getStatusCode(), 'query' => $httpClient, 'info' => $response->getInfo()];
                 } // if
                 return null;
             } else {
-                $responseBody = $response->toArray();
-                return $responseBody;
+                // $response->toArray() is only available for json response
+                $contentType = $response->getHeaders()['content-type'][0];
+                if ($contentType == 'application/json') {
+                    return $response->toArray();
+                } else {
+                    return $response->getContent();
+                } // if
             } // if
         } catch (\Exception $e) {
             if ($this->verbose) {
-                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+                return ['status' => $e->getCode(), 'query' => $httpClient, 'message' => $e->getMessage()];
             } // if
             return null;
         } // try
@@ -232,16 +238,21 @@ class HttpRequest
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'info' => $response->getInfo()];
+                    return ['status' => $response->getStatusCode(), 'query' => $httpClient, 'info' => $response->getInfo()];
                 } // if
                 return null;
             } else {
-                $responseBody = $response->toArray();
-                return $responseBody;
+                // $response->toArray() is only available for json response
+                $contentType = $response->getHeaders()['content-type'][0];
+                if ($contentType == 'application/json') {
+                    return $response->toArray();
+                } else {
+                    return $response->getContent();
+                } // if
             } // if
         } catch (\Exception $e) {
             if ($this->verbose) {
-                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+                return ['status' => $e->getCode(), 'query' => $httpClient, 'message' => $e->getMessage()];
             } // if
             return null;
         } // try
