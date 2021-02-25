@@ -47,7 +47,7 @@ class ApiJsonResponse
         $headers = [];
 
         // Always set to insure HSTS
-        $headers['Strict-Transport-Security'] = 'max-age=31536000M';
+        $headers['Strict-Transport-Security'] = 'max-age=31536000';
         if ($this->env->getEnv('HEADER_STRICT_TRANSPORT_SECURITY')) {
             $headers['Strict-Transport-Security'] = $this->env->getEnv('HEADER_STRICT_TRANSPORT_SECURITY');
         }  // if
@@ -127,6 +127,18 @@ class ApiJsonResponse
 
     } // buildJsonResult
 
+    /**
+     * Allowed status: standard, custom (by default, it is standard)
+     * @param $status
+     * @param $message
+     * @param $results
+     */
+    private function buildJsonErrorResult($statuscode, $errormessage)
+    {
+        // Return the same for custom or standard
+        return ['status' => $statuscode, 'message' => $errormessage];
+    } // buildJsonResult
+
 
     /**
      * @param array $results
@@ -196,7 +208,7 @@ class ApiJsonResponse
     {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            $this->buildJsonResult(400, $errorstring, []),
+            $this->buildJsonErrorResult(400, $errorstring),
             JsonResponse::HTTP_BAD_REQUEST,
             $headers
         );
@@ -212,7 +224,7 @@ class ApiJsonResponse
     {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            $this->buildJsonResult(401, $errorstring, []),
+            $this->buildJsonErrorResult(401, $errorstring),
             JsonResponse::HTTP_UNAUTHORIZED,
             $headers
         );
@@ -228,7 +240,7 @@ class ApiJsonResponse
     {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            $this->buildJsonResult(403, $errorstring, []),
+            $this->buildJsonErrorResult(403, $errorstring),
             JsonResponse::HTTP_FORBIDDEN,
             $headers
         );
@@ -242,7 +254,7 @@ class ApiJsonResponse
     {
         $headers = $this->buildAccessControlHeaders();
         return new JsonResponse(
-            $this->buildJsonResult(403, $errorstring, []),
+            $this->buildJsonErrorResult(404, $errorstring),
             JsonResponse::HTTP_NOT_FOUND,
             $headers
         );
