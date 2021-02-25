@@ -260,4 +260,26 @@ class ApiJsonResponse
         );
     } // _404NotFound
 
+
+    public function getGenericErrorResponse($statusCode, $errorstring = '')
+    {
+        $headers = $this->buildAccessControlHeaders();
+
+        // The status code is invalid!!! Set to 500 and show the status code change tentative.
+        if ( !array_key_exists($statusCode, JsonResponse::$statusTexts )) {
+            $errorstring = 'Unexpected http status code ' . $statusCode;
+            $statusCode = 500;
+        } // if
+
+        if (!$errorstring) {
+            $errorstring = JsonResponse::$statusTexts[$statusCode];
+        } // if
+
+        return new JsonResponse(
+            $this->buildJsonErrorResult($statusCode, $errorstring),
+            $statusCode,
+            $headers
+        );
+    }
+
 }
