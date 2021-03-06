@@ -1,6 +1,7 @@
 # TranoUtilsBundle  
   
 The TranoUtilsBundle contains utilities for the following purposes:
+- Extended Response with configurable headers using .env file variables
 - Json responses setter for REST API with configurable CORS headers using .env file variables
 - Simple syntax http query service
 - Environment variable reader
@@ -11,32 +12,71 @@ Install with composer using
 
     composer require trano/tranoutilsbundle
 
-## Usage of Json response setter with CORS headers
+## Extended Response with configurable headers
+
+The Response headers can be set using the following instruction:
+
+```php
+use Trano\UtilsBundle\Util\ExtendedResponse;
+
+$extendedreponse = new ExtendedResponse();
+$response = new Response('test');
+$responseWithHeaders = $extendedreponse->encapsulateHeaders($response);
+```
+
+The headers values can be set using the following environment variables:
+
+```dotenv
+HEADER_STRICT_TRANSPORT_SECURITY=""
+HEADER_CACHE_CONTROL=""
+HEADER_PRAGMA=""
+HEADER_REFERRER_POLICY=""
+HEADER_X_CONTENT_TYPE_OPTIONS=""
+HEADER_CONTENT_SECURITY_POLICY=""
+HEADER_X_FRAME_OPTIONS=""
+HEADER_X_XXS_PROTECTION=""
+```
+
+By default, the following secured header (https://owasp.org/) values are send back to the client when the corresponding environment variable is not set:
+
+```
+Strict-Transport-Security: max-age=31536000
+Cache-Control: no-cache, no-store, must-revalidate
+Pragma: no-cache
+Referrer-Policy: no-referrer
+X-Content-Type-Options: nosniff
+Content-Security-Policy: default-src 'self'
+X-Frame-Options: deny
+X-XXS-Protection: 1; mode=block
+```
+
+## Json Response configurable CORS headers and security headers
 
 ### Standard json response considering default security headers
 
 By default, the following secured header (https://owasp.org/) values are send back to the client:
 
-    Strict-Transport-Security: max-age=31536000M
-    Cache-Control: no-cache, no-store, must-revalidate
-    Pragma: no-cache
-    Referrer-Policy: no-referrer
-    X-Content-Type-Options: nosniff
-    Content-Security-Policy: default-src 'self'
-    X-Frame-Options: deny
-    X-XXS-Protection: 1; mode=block
-
+```
+Strict-Transport-Security: max-age=31536000
+Cache-Control: no-cache, no-store, must-revalidate
+Pragma: no-cache
+Referrer-Policy: no-referrer
+X-Content-Type-Options: nosniff
+Content-Security-Policy: default-src 'self'
+X-Frame-Options: deny
+X-XXS-Protection: 1; mode=block
+```
 The above headers can be updated using the following environment variables
-
-    HEADER_STRICT_TRANSPORT_SECURITY=""
-    HEADER_CACHE_CONTROL=""
-    HEADER_PRAGMA=""
-    HEADER_REFERRER_POLICY=""
-    HEADER_X_CONTENT_TYPE_OPTIONS=""
-    HEADER_CONTENT_SECURITY_POLICY=""
-    HEADER_X_FRAME_OPTIONS=""
-    HEADER_X_XXS_PROTECTION=""
-
+```dotenv
+HEADER_STRICT_TRANSPORT_SECURITY=""
+HEADER_CACHE_CONTROL=""
+HEADER_PRAGMA=""
+HEADER_REFERRER_POLICY=""
+HEADER_X_CONTENT_TYPE_OPTIONS=""
+HEADER_CONTENT_SECURITY_POLICY=""
+HEADER_X_FRAME_OPTIONS=""
+HEADER_X_XXS_PROTECTION=""
+```
 Let us consider that the GET method of our API returns the json below with ```Access-Control-Allow-Origin=*```, 
 ```Access-Control-Allow-Methods=GET,POST``` and ```Access-Control-Allow-Headers=Authorization, Content-Type``` 
 and with HTTP 200.
@@ -55,7 +95,7 @@ The php instruction to return the above json is
 
 The necessary environment variables at .env file are
 
-```
+```dotenv
 ALLOWED_ORIGIN="*"
 ALLOWED_METHODS="GET,POST"
 ALLOWED_HEADERS="Authorization, Content-Type"
@@ -73,7 +113,7 @@ Thus, the following php instruction
 
 will return the custom json below
 
-```
+```json
     {
         "data": "this is an ok custom results"
     }

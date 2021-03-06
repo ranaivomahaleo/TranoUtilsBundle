@@ -14,5 +14,10 @@
         <service id="Trano\UtilsBundle\Util\ApiJsonResponse" >
             <argument type="service" id="Trano\UtilsBundle\Util\Env" />
         </service>
+
+        <service id="Trano\UtilsBundle\Util\ExtendedResponse" >
+            <argument type="service" id="Trano\UtilsBundle\Util\Env" />
+        </service>
+
     </services>
 </container>
