@@ -50,11 +50,29 @@ X-Frame-Options: deny
 X-XXS-Protection: 1; mode=block
 ```
 
-## Json Response configurable CORS headers and security headers
+## JsonResponse with configurable CORS headers and security headers
 
-### Standard json response considering default security headers
+### JsonResponse with default security headers
 
-By default, the following secured header (https://owasp.org/) values are send back to the client:
+Use the following code to return a JsonResponse, code 200, with the default security headers:
+
+```php
+use Trano\UtilsBundle\Util\ApiJsonResponse;
+
+$apijsonreponse = new ApiJsonResponse();
+return $apijsonreponse->_200Ok('this is an ok results');
+```
+
+The result of the above instructions is (notice the adition of the `status`, `message` and `results` keys)
+```json
+{
+  "status": 200,
+  "message": "",
+  "results": "this is an ok results"
+}
+```
+
+By default, the following secured header values (https://owasp.org/)  are send back to the client:
 
 ```
 Strict-Transport-Security: max-age=31536000
@@ -77,46 +95,44 @@ HEADER_CONTENT_SECURITY_POLICY=""
 HEADER_X_FRAME_OPTIONS=""
 HEADER_X_XXS_PROTECTION=""
 ```
-Let us consider that the GET method of our API returns the json below with ```Access-Control-Allow-Origin=*```, 
-```Access-Control-Allow-Methods=GET,POST``` and ```Access-Control-Allow-Headers=Authorization, Content-Type``` 
-and with HTTP 200.
 
-    {
-        "status": 200, 
-        "message": "",
-        "results": "this is an ok results"
-    }
-
-The php instruction to return the above json is
-
-    return $this->apijsonresponse->_200Ok('this is an ok results');
-
-```$apijsonresponse``` is a ```Trano\UtilsBundle\Util\ApiJsonResponse``` service.
-
-The necessary environment variables at .env file are
+To update the CORS headers (```Access-Control.*```), use the following environment variables.
 
 ```dotenv
 ALLOWED_ORIGIN="*"
 ALLOWED_METHODS="GET,POST"
 ALLOWED_HEADERS="Authorization, Content-Type"
 ```
+The map between environment variables and the headers are 
 
-### Custom json response
+| Environment variable | Header |
+| --- | --- |
+| ALLOWED_ORIGIN | Access-Control-Allow-Origin |
+| ALLOWED_METHODS | Access-Control-Allow-Methods |
+| ALLOWED_HEADERS | Access-Control-Allow-Headers |
 
-For a custom Json, set the environment variable ```JSON_RESPONSE_TYPE``` to ```custom```
-```
+### Custom JsonResponse
+
+By default, `ApiJsonResponse` returns a json with `status`, `message` and `results` keys. To change this behaviour with a custom json data structure, set
+
+```dotenv
 JSON_RESPONSE_TYPE=custom
 ```
-Thus, the following php instruction
 
-    return $this->apijsonresponse->_200Ok(["data" => 'this is an ok custom results']);
+Thus, the following php code
 
-will return the custom json below
+```php
+use Trano\UtilsBundle\Util\ApiJsonResponse;
+
+$apijsonreponse = new ApiJsonResponse();
+return $apijsonreponse->_200Ok(["data" => 'this is an ok custom results']);
+```
+returns
 
 ```json
-    {
-        "data": "this is an ok custom results"
-    }
+{
+  "data": "this is an ok custom results"
+}
 ```
 
 ## Usage of simple Http request
