@@ -50,6 +50,19 @@ X-Frame-Options: deny
 X-XXS-Protection: 1; mode=block
 ```
 
+The map between environment variables and the security headers are
+
+| Environment variable | Header | Default value |
+| --- | --- | --- |
+| HEADER_STRICT_TRANSPORT_SECURITY | Strict-Transport-Security | max-age=31536000 |
+| HEADER_CACHE_CONTROL | Cache-Control | no-cache, no-store, must-revalidate |
+| HEADER_PRAGMA | Pragma | no-cache |
+| HEADER_REFERRER_POLICY | Referrer-Policy | no-referrer |
+| HEADER_X_CONTENT_TYPE_OPTIONS | X-Content-Type-Options | nosniff |
+| HEADER_CONTENT_SECURITY_POLICY | Content-Security-Policy | default-src 'self' |
+| HEADER_X_FRAME_OPTIONS | X-Frame-Options | deny |
+| HEADER_X_XXS_PROTECTION | X-XXS-Protection | 1; mode=block |
+
 ## JsonResponse with configurable CORS headers and security headers
 
 ### JsonResponse with default security headers
