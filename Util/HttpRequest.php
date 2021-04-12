@@ -206,13 +206,17 @@ class HttpRequest
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'query' => $httpClient, 'info' => $response->getInfo()];
+                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent()];
                 } // if
                 return null;
             } else {
                 // $response->toArray() is only available for json response
-                $contentType = $response->getHeaders()['content-type'][0];
-                if ($contentType == 'application/json') {
+                // The content-type may have multiple values separated by ;.
+                // Example: application/json; charset=utf-8
+                $contentTypeString = $response->getHeaders()['content-type'][0];
+                $contentTypeArray = explode(';', $contentTypeString);
+                $contentTypeArray = array_map('trim', $contentTypeArray);
+                if (in_array('application/json', $contentTypeArray)) {
                     return $response->toArray();
                 } else {
                     return $response->getContent();
@@ -220,7 +224,7 @@ class HttpRequest
             } // if
         } catch (\Exception $e) {
             if ($this->verbose) {
-                return ['status' => $e->getCode(), 'query' => $httpClient, 'message' => $e->getMessage()];
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
             } // if
             return null;
         } // try
@@ -233,18 +237,23 @@ class HttpRequest
         try {
             $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('POST', $url, $this->headers);
+
             // do this instead
             if (200 !== $response->getStatusCode()) {
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'query' => $httpClient, 'info' => $response->getInfo()];
+                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent()];
                 } // if
                 return null;
             } else {
                 // $response->toArray() is only available for json response
-                $contentType = $response->getHeaders()['content-type'][0];
-                if ($contentType == 'application/json') {
+                // The content-type may have multiple values separated by ;.
+                // Example: application/json; charset=utf-8
+                $contentTypeString = $response->getHeaders()['content-type'][0];
+                $contentTypeArray = explode(';', $contentTypeString);
+                $contentTypeArray = array_map('trim', $contentTypeArray);
+                if (in_array('application/json', $contentTypeArray)) {
                     return $response->toArray();
                 } else {
                     return $response->getContent();
@@ -252,7 +261,7 @@ class HttpRequest
             } // if
         } catch (\Exception $e) {
             if ($this->verbose) {
-                return ['status' => $e->getCode(), 'query' => $httpClient, 'message' => $e->getMessage()];
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
             } // if
             return null;
         } // try
