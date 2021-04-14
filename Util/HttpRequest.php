@@ -43,6 +43,13 @@ class HttpRequest
 
 
     /**
+     * Generate exception = true means that for each http problem, an exception is returned.
+     * @var bool
+     */
+    private $generateException = false;
+
+
+    /**
      * @var float
      */
     private $timeout = 0;
@@ -52,6 +59,7 @@ class HttpRequest
      * @var Env
      */
     private $env;
+
 
     /**
      * HttpRequest constructor.
@@ -185,6 +193,16 @@ class HttpRequest
     {
         $this->verbose = $verbose;
         return $this;
+    }
+
+    /**
+     * @param bool $generateException
+     * @return HttpRequest
+     */
+    public function setGenerateException(bool $generateException): HttpRequest
+    {
+        $this->generateException = $generateException;
+        return $this;
     } // setTimeOut
 
 
@@ -206,7 +224,7 @@ class HttpRequest
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent()];
+                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent($this->generateException)];
                 } // if
                 return null;
             } else {
@@ -243,7 +261,7 @@ class HttpRequest
                 // handle the HTTP request error (e.g. retry the request)
                 // throw new TransportException();
                 if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent()];
+                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent($this->generateException)];
                 } // if
                 return null;
             } else {
