@@ -206,40 +206,47 @@ class HttpRequest
     } // setTimeOut
 
 
+    /**
+     * Treat http response and return the corresponding data or exception
+     * @param $response
+     * @return array|mixed|null
+     */
+    private function getDataOrExceptionFromResponse($response)
+    {
+        if (200 !== $response->getStatusCode()) {
+            // handle the HTTP request error (e.g. retry the request)
+            // throw new TransportException();
+            if ($this->verbose) {
+                return ['status' => $response->getStatusCode(), 'message' => $response->getContent($this->generateException)];
+            } // if
+            return null;
+        } else {
+            // $response->toArray() is only available for json response
+            // The content-type may have multiple values separated by ;.
+            // Example: application/json; charset=utf-8
+            $contentTypeString = $response->getHeaders()['content-type'][0];
+            $contentTypeArray = explode(';', $contentTypeString);
+            $contentTypeArray = array_map('trim', $contentTypeArray);
+            if (in_array('application/json', $contentTypeArray)) {
+                return $response->toArray();
+            } else {
+                return $response->getContent();
+            } // if
+        } // if
+    }
+
 
 
     public function get($url)
     {
         try {
-
             if ($this->env->getEnv('ALLOWED_ORIGIN')) {
                 $headers['Access-Control-Allow-Origin'] = $this->env->getEnv('ALLOWED_ORIGIN');
             } // if
 
             $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('GET', $url, $this->headers);
-
-            // do this instead
-            if (200 !== $response->getStatusCode()) {
-                // handle the HTTP request error (e.g. retry the request)
-                // throw new TransportException();
-                if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent($this->generateException)];
-                } // if
-                return null;
-            } else {
-                // $response->toArray() is only available for json response
-                // The content-type may have multiple values separated by ;.
-                // Example: application/json; charset=utf-8
-                $contentTypeString = $response->getHeaders()['content-type'][0];
-                $contentTypeArray = explode(';', $contentTypeString);
-                $contentTypeArray = array_map('trim', $contentTypeArray);
-                if (in_array('application/json', $contentTypeArray)) {
-                    return $response->toArray();
-                } else {
-                    return $response->getContent();
-                } // if
-            } // if
+            return $this->getDataOrExceptionFromResponse($response);
         } catch (\Exception $e) {
             if ($this->verbose) {
                 return ['status' => $e->getCode(), 'message' => $e->getMessage()];
@@ -255,28 +262,7 @@ class HttpRequest
         try {
             $httpClient = HttpClient::create($this->options);
             $response = $httpClient->request('POST', $url, $this->headers);
-
-            // do this instead
-            if (200 !== $response->getStatusCode()) {
-                // handle the HTTP request error (e.g. retry the request)
-                // throw new TransportException();
-                if ($this->verbose) {
-                    return ['status' => $response->getStatusCode(), 'message' => $response->getContent($this->generateException)];
-                } // if
-                return null;
-            } else {
-                // $response->toArray() is only available for json response
-                // The content-type may have multiple values separated by ;.
-                // Example: application/json; charset=utf-8
-                $contentTypeString = $response->getHeaders()['content-type'][0];
-                $contentTypeArray = explode(';', $contentTypeString);
-                $contentTypeArray = array_map('trim', $contentTypeArray);
-                if (in_array('application/json', $contentTypeArray)) {
-                    return $response->toArray();
-                } else {
-                    return $response->getContent();
-                } // if
-            } // if
+            return $this->getDataOrExceptionFromResponse($response);
         } catch (\Exception $e) {
             if ($this->verbose) {
                 return ['status' => $e->getCode(), 'message' => $e->getMessage()];
@@ -286,5 +272,47 @@ class HttpRequest
     } // post
 
 
+    public function put($url)
+    {
+        try {
+            $httpClient = HttpClient::create($this->options);
+            $response = $httpClient->request('PUT', $url, $this->headers);
+            return $this->getDataOrExceptionFromResponse($response);
+        } catch (\Exception $e) {
+            if ($this->verbose) {
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            } // if
+            return null;
+        } // try
+    }
+
+
+    public function patch($url)
+    {
+        try {
+            $httpClient = HttpClient::create($this->options);
+            $response = $httpClient->request('PATCH', $url, $this->headers);
+            return $this->getDataOrExceptionFromResponse($response);
+        } catch (\Exception $e) {
+            if ($this->verbose) {
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            } // if
+            return null;
+        } // try
+    }
+
+    public function delete($url)
+    {
+        try {
+            $httpClient = HttpClient::create($this->options);
+            $response = $httpClient->request('DELETE', $url, $this->headers);
+            return $this->getDataOrExceptionFromResponse($response);
+        } catch (\Exception $e) {
+            if ($this->verbose) {
+                return ['status' => $e->getCode(), 'message' => $e->getMessage()];
+            } // if
+            return null;
+        } // try
+    }
 
 }
